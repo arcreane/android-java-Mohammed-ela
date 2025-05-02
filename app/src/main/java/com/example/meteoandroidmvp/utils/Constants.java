@@ -1,8 +1,8 @@
 package com.example.meteoandroidmvp.utils;
 
 public class Constants {
-    // Clé API OpenWeatherMap
-    public static final String API_KEY = "😂";
+    // Clé API OpenWeatherMap (à remplacer par votre clé API)
+    public static final String API_KEY = "votre_clé_api_ici";
     
     // URL de base pour les icônes météo
     public static final String ICON_URL = "https://openweathermap.org/img/wn/%s@2x.png";
