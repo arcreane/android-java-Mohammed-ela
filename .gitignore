@@ -1,0 +1,75 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+
+
+
+
+
+
+
+
+# Android Studio
+.idea/
+.gradle/
+local.properties
+*.iml
+*.ipr
+*.iws
+
+# Build outputs
+/build/
+*/build/
+captures/
+output.json
+
+# Gradle
+.gradle/
+build/
+
+# Signing/keystore files
+*.jks
+*.keystore
+
+# Google Services (API keys etc.)
+google-services.json
+fabric.properties
+
+# Log/temporary files
+*.log
+*.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VSCode
+.vscode/
+
+# NDK
+.cxx/
+
+# Jetpack Compose
+*.hprof
+
+# Crashlytics
+crashlytics-build.properties
+
+# Kotlin (si jamais)
+*.kotlin_module
+
+# Test results
+test-results/
