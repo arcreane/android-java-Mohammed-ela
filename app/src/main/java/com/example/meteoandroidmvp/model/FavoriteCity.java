@@ -2,14 +2,37 @@ package com.example.meteoandroidmvp.model;
 
 import java.util.Date;
 
+/**
+ * Modèle de données représentant une ville favorite pour l'utilisateur
+ * Stocke toutes les informations nécessaires pour retrouver les données météo de cette ville
+ */
 public class FavoriteCity {
+    // Nom de la ville (ex: "Paris")
     private String cityName;
+    
+    // Code pays (ex: "FR")
     private String country;
+    
+    // Date de la dernière consultation des données météo pour cette ville
     private Date lastUpdate;
+    
+    // Coordonnées géographiques
     private double latitude;
     private double longitude;
+    
+    // Indique si cette ville a été ajoutée via la localisation de l'appareil
     private boolean fromLocation;
 
+    /**
+     * Constructeur complet avec tous les champs
+     * 
+     * @param cityName Nom de la ville
+     * @param country Code pays à 2 lettres
+     * @param lastUpdate Date de dernière mise à jour
+     * @param latitude Latitude en degrés décimaux
+     * @param longitude Longitude en degrés décimaux
+     * @param fromLocation True si ajoutée via localisation GPS
+     */
     public FavoriteCity(String cityName, String country, Date lastUpdate, double latitude, double longitude, boolean fromLocation) {
         this.cityName = cityName;
         this.country = country;
@@ -67,6 +90,12 @@ public class FavoriteCity {
         this.fromLocation = fromLocation;
     }
 
+    /**
+     * Retourne le nom complet de la ville avec son pays
+     * Format: "Paris, FR"
+     * 
+     * @return Nom formaté de la ville
+     */
     public String getFullName() {
         if (country != null && !country.isEmpty()) {
             return cityName + ", " + country;
