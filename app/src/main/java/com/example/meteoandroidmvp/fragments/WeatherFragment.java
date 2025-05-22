@@ -32,23 +32,28 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.meteoandroidmvp.R;
 import com.example.meteoandroidmvp.adapter.ForecastAdapter;
+import com.example.meteoandroidmvp.adapter.ForecastDayAdapter;
 import com.example.meteoandroidmvp.contract.WeatherContract;
 import com.example.meteoandroidmvp.model.FavoriteCity;
 import com.example.meteoandroidmvp.model.ForecastResponse;
 import com.example.meteoandroidmvp.model.WeatherResponse;
+import com.example.meteoandroidmvp.model.ForecastDay;
 import com.example.meteoandroidmvp.presenter.WeatherPresenter;
 import com.example.meteoandroidmvp.utils.Constants;
 import com.example.meteoandroidmvp.utils.NotificationUtils;
+import com.example.meteoandroidmvp.utils.DateUtils;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.ArrayList;
 
 public class WeatherFragment extends Fragment implements WeatherContract.View {
 
     private WeatherContract.Presenter presenter;
-    private ForecastAdapter forecastAdapter;
+    private ForecastDayAdapter forecastDayAdapter;
     private String currentCity = "";
     private double currentLatitude = 0.0;
     private double currentLongitude = 0.0;
@@ -109,7 +114,7 @@ public class WeatherFragment extends Fragment implements WeatherContract.View {
         super.onCreate(savedInstanceState);
         presenter = new WeatherPresenter();
         presenter.attachView(this);
-        forecastAdapter = new ForecastAdapter();
+        forecastDayAdapter = new ForecastDayAdapter(getContext());
         
         // Initialiser le lanceur de demande de permission
         requestPermissionLauncher = registerForActivityResult(
@@ -140,7 +145,7 @@ public class WeatherFragment extends Fragment implements WeatherContract.View {
         
         // Configuration du RecyclerView
         recyclerForecast.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerForecast.setAdapter(forecastAdapter);
+        recyclerForecast.setAdapter(forecastDayAdapter);
         
         // Configuration des listeners
         setupListeners();
@@ -202,7 +207,10 @@ public class WeatherFragment extends Fragment implements WeatherContract.View {
         tvCloudiness = view.findViewById(R.id.tv_cloudiness);
         tvSunrise = view.findViewById(R.id.tv_sunrise);
         tvSunset = view.findViewById(R.id.tv_sunset);
-        recyclerForecast = view.findViewById(R.id.recycler_forecast);
+        recyclerForecast = view.findViewById(R.id.recycler_forecast_days);
+        recyclerForecast.setLayoutManager(new LinearLayoutManager(getContext()));
+        forecastDayAdapter = new ForecastDayAdapter(getContext());
+        recyclerForecast.setAdapter(forecastDayAdapter);
         weatherContent = view.findViewById(R.id.weather_content);
         tvErrorMessage = view.findViewById(R.id.tv_error_message);
     }
@@ -435,8 +443,45 @@ public class WeatherFragment extends Fragment implements WeatherContract.View {
     @Override
     public void showForecast(ForecastResponse forecastResponse) {
         if (forecastResponse != null && forecastResponse.getForecastItems() != null) {
-            forecastAdapter.setForecastItems(forecastResponse.getForecastItems());
+            // Organiser les prévisions par jour
+            List<ForecastDay> forecastDays = groupForecastItemsByDay(forecastResponse.getForecastItems());
+            forecastDayAdapter.setForecastDays(forecastDays);
         }
+    }
+    
+    /**
+     * Groupe les éléments de prévision par jour
+     *
+     * @param forecastItems Liste des prévisions
+     * @return Liste des jours de prévisions, chacun contenant ses prévisions horaires
+     */
+    private List<ForecastDay> groupForecastItemsByDay(List<ForecastResponse.ForecastItem> forecastItems) {
+        List<ForecastDay> result = new ArrayList<>();
+        if (forecastItems == null || forecastItems.isEmpty()) {
+            return result;
+        }
+        
+        // Parcourir chaque élément de prévision
+        ForecastDay currentDay = null;
+        long currentDayTimestamp = 0;
+        
+        for (ForecastResponse.ForecastItem item : forecastItems) {
+            long itemTimestamp = item.getDateTime() * 1000; // Convertir en millisecondes
+            
+            // Si c'est le premier élément ou un nouveau jour
+            if (currentDay == null || !DateUtils.isSameDay(currentDayTimestamp, itemTimestamp)) {
+                // Créer un nouveau jour
+                String dayTitle = DateUtils.getFormattedDayTitle(itemTimestamp);
+                currentDay = new ForecastDay(dayTitle);
+                currentDayTimestamp = itemTimestamp;
+                result.add(currentDay);
+            }
+            
+            // Ajouter la prévision au jour courant
+            currentDay.addHourlyForecast(item);
+        }
+        
+        return result;
     }
     
     @Override

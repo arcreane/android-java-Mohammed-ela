@@ -309,8 +309,9 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/card_details" />
 
+            <!-- RecyclerView vertical pour les groupes de jours -->
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_forecast"
+                android:id="@+id/recycler_forecast_days"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
