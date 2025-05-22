@@ -10,7 +10,14 @@ public class Constants {
      * Dans un projet réel, cette clé devrait être stockée dans des variables d'environnement
      * ou obtenue depuis un serveur sécurisé
      */
-    public static final String API_KEY = "ma clé";
+    public static final String API_KEY = "";
+    
+    /**
+     * Clé API pour accéder à Mistral AI
+     * Dans un projet réel, cette clé devrait être stockée de manière sécurisée
+     * et non en dur dans le code
+     */
+    public static final String MISTRAL_API_KEY = "";
     
     /**
      * Format d'URL pour récupérer les icônes météo
