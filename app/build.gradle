@@ -46,6 +46,12 @@ dependencies {
     // Services de localisation Google
     implementation 'com.google.android.gms:play-services-location:21.0.1'
     
+    // OkHttp pour les requêtes HTTP (déjà présent via Retrofit)
+    implementation 'com.squareup.okhttp3:okhttp:4.9.1'
+    
+    // Gson pour la sérialisation JSON (déjà présent via Retrofit)
+    implementation 'com.google.code.gson:gson:2.8.9'
+    
     // Testing
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit

@@ -82,8 +82,27 @@ public class NotificationReceiver extends BroadcastReceiver {
                         description = weatherData.getWeather().get(0).getDescription();
                     }
                     
+                    // Récupérer d'autres données météo pour l'IA
+                    float windSpeed = 0;
+                    if (weatherData.getWind() != null) {
+                        windSpeed = weatherData.getWind().getSpeed();
+                    }
+                    
+                    int humidity = 0;
+                    if (weatherData.getMain() != null) {
+                        humidity = weatherData.getMain().getHumidity();
+                    }
+                    
                     // Afficher la notification avec les conseils vestimentaires
-                    NotificationUtils.showWeatherClothingNotification(context, cityName, temperature, description);
+                    // en utilisant toutes les données disponibles
+                    NotificationUtils.showWeatherClothingNotification(
+                        context, 
+                        cityName, 
+                        temperature, 
+                        description, 
+                        windSpeed, 
+                        humidity
+                    );
                     
                     // Reprogrammer la notification pour le lendemain
                     // Cela se fait automatiquement si on utilise setRepeating, mais pour setExactAndAllowWhileIdle il faut le faire manuellement

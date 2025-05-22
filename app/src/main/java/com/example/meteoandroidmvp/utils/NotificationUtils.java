@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -212,9 +213,23 @@ public class NotificationUtils {
     
     /**
      * Affiche une notification avec des recommandations vestimentaires
-     * basées sur la météo actuelle
+     * basées sur la météo actuelle en utilisant Mistral AI
+     * 
+     * @param context Contexte de l'application
+     * @param cityName Nom de la ville
+     * @param temperature Température en degrés Celsius
+     * @param weatherDescription Description de la météo
+     * @param windSpeed Vitesse du vent en m/s
+     * @param humidity Humidité en pourcentage
      */
-    public static void showWeatherClothingNotification(Context context, String cityName, float temperature, String weatherDescription) {
+    public static void showWeatherClothingNotification(
+            Context context, 
+            String cityName, 
+            float temperature, 
+            String weatherDescription,
+            float windSpeed,
+            int humidity) {
+        
         // Intent qui sera exécuté quand l'utilisateur clique sur la notification
         Intent intent = new Intent(context, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -222,32 +237,58 @@ public class NotificationUtils {
         
         // Titre standard de la notification
         String contentTitle = "Météo du jour à " + cityName;
-        String contentText;
         
-        // Définir le message en fonction de la température
-        if (temperature >= 25) {
-            // Conseils pour temps chaud
-            contentText = "Il fait chaud aujourd'hui ! Pensez à prendre une casquette et à porter des vêtements légers (T-shirt, short).";
-        } else if (temperature >= 15 && temperature < 25) {
-            // Température agréable
-            contentText = "Il fait bon aujourd'hui à " + cityName + ". Température agréable de " + temperature + "°C.";
-        } else {
-            // Conseils pour temps froid
-            contentText = "Il fait froid aujourd'hui. Pensez à bien vous couvrir !";
-        }
-        
-        // Ajout d'un conseil pour la pluie si nécessaire
-        if (weatherDescription.toLowerCase().contains("pluie") || 
-            weatherDescription.toLowerCase().contains("pluvieux") ||
-            weatherDescription.toLowerCase().contains("averse")) {
-            contentText += " N'oubliez pas votre parapluie !";
-        }
+        // Demander une recommandation à Mistral AI (service d'IA externe)
+        MistralAIService.getClothingRecommendation(
+                cityName,
+                temperature,
+                weatherDescription,
+                windSpeed,
+                humidity,
+                new MistralAIService.AIResponseCallback() {
+                    @Override
+                    public void onResponse(String recommendation) {
+                        // La réponse de l'IA est reçue, afficher la notification
+                        showNotificationWithRecommendation(
+                                context,
+                                contentTitle,
+                                recommendation,
+                                pendingIntent,
+                                cityName
+                        );
+                    }
+                    
+                    @Override
+                    public void onFailure(String errorMessage) {
+                        // En cas d'erreur, utiliser le message d'erreur qui contient déjà
+                        // une recommandation générée par l'IA locale
+                        showNotificationWithRecommendation(
+                                context,
+                                contentTitle,
+                                errorMessage,
+                                pendingIntent,
+                                cityName
+                        );
+                    }
+                }
+        );
+    }
+    
+    /**
+     * Affiche la notification avec la recommandation reçue
+     */
+    private static void showNotificationWithRecommendation(
+            Context context,
+            String title,
+            String contentText,
+            PendingIntent pendingIntent,
+            String cityName) {
         
         // Construction de la notification avec tous ses paramètres
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle(contentTitle)
-                .setContentText(contentText)
+                .setContentTitle(title)
+                .setContentText("Recommandations vestimentaires...")
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(contentText))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
@@ -263,6 +304,8 @@ public class NotificationUtils {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
                 notificationManager.notify(notificationId, builder.build());
+            } else {
+                Log.e("NotificationUtils", "Permission de notification manquante sur Android 13+");
             }
         } else {
             // Sur les versions plus anciennes, pas besoin de vérifier

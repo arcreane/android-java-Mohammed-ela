@@ -329,7 +329,22 @@ public class WeatherFragment extends Fragment implements WeatherContract.View {
                 }
                 
                 // Afficher une notification test immédiatement
-                NotificationUtils.showWeatherClothingNotification(getContext(), cityName, temperature, description);
+                float windSpeed = 0;
+                int humidity = 0;
+                if (currentWeather.getWind() != null) {
+                    windSpeed = currentWeather.getWind().getSpeed();
+                }
+                if (currentWeather.getMain() != null) {
+                    humidity = currentWeather.getMain().getHumidity();
+                }
+                NotificationUtils.showWeatherClothingNotification(
+                    getContext(), 
+                    cityName, 
+                    temperature, 
+                    description,
+                    windSpeed,
+                    humidity
+                );
             }
         }
     }
