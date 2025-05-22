@@ -73,3 +73,5 @@ crashlytics-build.properties
 
 # Test results
 test-results/
+
+app/src/main/java/com/example/meteoandroidmvp/utils/Constants.java
